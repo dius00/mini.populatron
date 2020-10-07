@@ -1,28 +1,20 @@
 const fs = require("fs");
 const csv = require("csv-parser");
 
-const filepath = "./cities.csv";
-
-async function calculate() {
-  let popArr = [];
-  fs.createReadStream(filepath)
-    .pipe(csv())
-    .on("data", (row) => {
-      popArr.push(row.population);
-    })
-    .on(
-      "end",
-      () =>
-        (popArr = popArr.reduce(
-          (accumulator, currentValue) => accumulator + currentValue
-        ))
-    );
-  return Promise.resolve(popArr);
-}
+let tally = 0;
+const parseIt = async () => {
+  return new Promise((resolve) => {
+    fs.createReadStream("cities.csv")
+      .pipe(csv())
+      .on("data", (data) => (tally += parseInt(data.population)))
+      .on("end", () => {
+        resolve(tally);
+      });
+  });
+};
 
 module.exports = {
   totalPopulation(onFinished) {
-    onFinished = calculate();
-    return onFinished.then((arr) => arr.reduce((a, b) => a + b));
+    parseIt().then((end) => onFinished(end));
   },
 };
