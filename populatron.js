@@ -14,7 +14,8 @@ const parseIt = async () => {
 };
 
 module.exports = {
-  totalPopulation(onFinished) {
-    parseIt().then((end) => onFinished(end));
+  async totalPopulation(onFinished) {
+    onFinished(await parseIt());
+    //parseIt().then((end) => onFinished(end));
   },
 };
